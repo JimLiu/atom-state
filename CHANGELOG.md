@@ -1,3 +1,10 @@
+#### 0.0.5 (2020-06-06)
+
+##### New Features
+
+*  Add overloads for createStore function ([879f9cd5](https://github.com/JimLiu/atom-state/commit/879f9cd57a6684c6c79492fdfc859e52bf0e48f8))
+
+
 #### 0.0.4 (2020-06-06)
 
 ##### Refactors
