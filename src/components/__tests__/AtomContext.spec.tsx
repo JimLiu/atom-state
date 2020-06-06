@@ -2,7 +2,7 @@ import React, { useContext, FunctionComponent } from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import AtomContext, { DefaultAtomStore } from '../AtomContext'
-import { createStore } from '../../core/AtomStore'
+import createStore from '../../utils/createStore'
 
 const consoleError = console.error.bind(console)
 

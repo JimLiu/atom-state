@@ -1,4 +1,5 @@
-import AtomStore, { createStore } from '../AtomStore'
+import AtomStore from '../AtomStore'
+import createStore from '../../utils/createStore'
 
 test('AtomStore can be initialized with empty param', () => {
   let store = new AtomStore()

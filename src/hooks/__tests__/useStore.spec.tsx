@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react-hooks'
 
 import { DefaultAtomStore } from '../../components/AtomContext'
 import AtomRoot from '../../components/AtomRoot'
-import { createStore } from '../../core/AtomStore'
+import createStore from '../../utils/createStore'
 import useStore from '../useStore'
 
 test('useStore should return a default store if there is no AtomContext', () => {
