@@ -4,7 +4,7 @@ import { render, fireEvent, screen } from '@testing-library/react'
 import { renderHook, act } from '@testing-library/react-hooks'
 
 import AtomRoot from '../../components/AtomRoot'
-import { createStore } from '../../core/AtomStore'
+import createStore from '../../utils/createStore'
 import useAtomState from '../useAtomState'
 
 test('useAtomState should return the atom state', () => {

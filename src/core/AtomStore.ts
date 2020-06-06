@@ -9,10 +9,6 @@ export interface IAtomStore {
   unsubscribeAtom: (key: any, listener: AtomStoreListener) => void
 }
 
-export function createStore (defaultAtoms?: Map<any, any>): AtomStore {
-  return new AtomStore(defaultAtoms)
-}
-
 export default class AtomStore implements IAtomStore {
   subscriptionsForAtoms: Map<any, Array<AtomStoreListener>>
   batcher: Batcher
