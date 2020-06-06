@@ -1,6 +1,6 @@
 {
   "name": "atom-state",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A state management library for React",
   "main": "build/index.js",
   "module": "build/index.es.js",
