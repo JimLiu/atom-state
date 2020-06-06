@@ -43,7 +43,7 @@ test('AtomStore can subscribe the atom value change', () => {
   let atomValues = new Map([['foo', 'bar']])
 
   let store = new AtomStore(atomValues)
-  store.subscribe('foo', value => {
+  store.subscribeAtom('foo', value => {
     expect(value).toEqual('new bar')
   })
   store.setAtomValue('foo', 'new bar')
@@ -54,7 +54,7 @@ test('AtomStore call lisener once after the atom value change', () => {
 
   const mockLisener = jest.fn()
   let store = new AtomStore(atomValues)
-  store.subscribe('foo', mockLisener)
+  store.subscribeAtom('foo', mockLisener)
   store.setAtomValue('foo', 'new bar')
 
   setTimeout(() => {
@@ -67,8 +67,8 @@ test('AtomStore can unsubscribe the atom value change', () => {
 
   const mockLisener = jest.fn()
   let store = new AtomStore(atomValues)
-  store.subscribe('foo', mockLisener)
-  store.unsubscribe('foo', mockLisener)
+  store.subscribeAtom('foo', mockLisener)
+  store.unsubscribeAtom('foo', mockLisener)
   store.setAtomValue('foo', 'new bar')
 
   setTimeout(() => {
@@ -81,7 +81,7 @@ test('AtomStore unsubscribe a not subscribed key', () => {
 
   const mockLisener = jest.fn()
   let store = new AtomStore(atomValues)
-  store.unsubscribe('foo', mockLisener)
+  store.unsubscribeAtom('foo', mockLisener)
   store.setAtomValue('foo', 'new bar')
 
   setTimeout(() => {
@@ -98,9 +98,9 @@ test('AtomStore notifies changes', () => {
   const mockFooLisener = jest.fn()
   const mockBarLisener = jest.fn()
   let store = new AtomStore(atomValues)
-  store.subscribe('foo', mockFooLisener)
-  store.subscribe('bar', mockBarLisener)
-  store.notifyChanges(['foo', 'bar'])
+  store.subscribeAtom('foo', mockFooLisener)
+  store.subscribeAtom('bar', mockBarLisener)
+  store.notifyAtomsChange(['foo', 'bar'])
 
   setTimeout(() => {
     expect(mockFooLisener.mock.calls.length).toBe(1)

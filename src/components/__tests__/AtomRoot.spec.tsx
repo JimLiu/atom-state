@@ -5,22 +5,34 @@ import AtomContext from '../AtomContext'
 import { createStore } from '../../core/AtomStore'
 import AtomRoot from '../AtomRoot'
 
+const consoleError = console.error.bind(console)
+
 const TestComponent: FunctionComponent = () => {
   const store = useContext(AtomContext)
   return <span>name: {store.getAtomValue('name')}</span>
 }
 
-test('Throws exception when the component is not used inside a <AtomRoot> component', () => {
-  expect(() => {
-    render(<TestComponent />)
-  }).toThrow(/must be used inside a <AtomRoot> component/)
-})
+describe('Throws exception', () => {
+  beforeAll(() => {
+    global.console.error = () => {}
+  });
+  afterAll(() => {
+    global.console.error = consoleError
+  })
 
-test('Throws exception when the component is used inside a <AtomRoot> component without a store property', () => {
-  expect(() => {
-    render(<TestComponent />)
-  }).toThrow(/must be used inside a <AtomRoot> component/)
-})
+  test('when the component is not used inside a <AtomRoot> component', () => {
+    expect(() => {
+      render(<TestComponent />)
+    }).toThrow(/must be used inside a <AtomRoot> component/)
+  })
+
+  test('when the component is used inside a <AtomRoot> component without a store property', () => {
+    expect(() => {
+      render(<TestComponent />)
+    }).toThrow(/must be used inside a <AtomRoot> component/)
+  })
+});
+
 
 test('Does not throw exception when it is used inside a AtomRoot with a store value', () => {
   const store = createStore()

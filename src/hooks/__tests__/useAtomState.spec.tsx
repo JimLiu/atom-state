@@ -22,7 +22,7 @@ test('useAtomState should return the atom state', () => {
   expect(result.current[0]).toEqual('Atom')
 })
 
-test('useAtomState should set the atom state', () => {
+test('useAtomState should set the atom state', async () => {
   const defaultAtoms = new Map()
   defaultAtoms.set('name', 'Atom')
 
@@ -32,16 +32,15 @@ test('useAtomState should set the atom state', () => {
     <AtomRoot store={store}>{children}</AtomRoot>
   )
 
-  const { result, rerender } = renderHook(() => useAtomState('name'), {
+  const { result, waitForNextUpdate } = renderHook(() => useAtomState('name'), {
     wrapper
   })
 
-  act(() => {
+  await act(async () => {
     const [, setName] = result.current
     setName('Junmin')
+    await waitForNextUpdate();
   })
-
-  rerender()
 
   expect(result.current[0]).toEqual('Junmin')
 })

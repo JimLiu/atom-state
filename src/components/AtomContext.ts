@@ -16,11 +16,11 @@ export class DefaultAtomStore implements IAtomStore {
     notInAContext()
   }
 
-  subscribe () {
+  subscribeAtom () {
     notInAContext()
   }
 
-  unsubscribe () {
+  unsubscribeAtom () {
     notInAContext()
   }
 }

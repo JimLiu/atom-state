@@ -24,10 +24,10 @@ export default function useAtomState (atomKey: any): [any, SetAtomValueFunc] {
     const subscriber = () => {
       setCounter(count => count + 1)
     }
-    store.subscribe(atomKey, subscriber)
+    store.subscribeAtom(atomKey, subscriber)
 
     return () => {
-      store.unsubscribe(atomKey, subscriber)
+      store.unsubscribeAtom(atomKey, subscriber)
     }
   }, [store, atomKey])
 
