@@ -5,40 +5,41 @@ export type AtomStoreListener = (newValue: any, key: any) => void
 export interface IAtomStore {
   getAtomValue: (key: any) => any
   setAtomValue: (key: any, newValue: any) => void
-  subscribe: (key: any, listener: AtomStoreListener) => void
-  unsubscribe: (key: any, listener: AtomStoreListener) => void
+  subscribeAtom: (key: any, listener: AtomStoreListener) => void
+  unsubscribeAtom: (key: any, listener: AtomStoreListener) => void
 }
+
 export function createStore (defaultAtoms?: Map<any, any>): AtomStore {
   return new AtomStore(defaultAtoms)
 }
 
 export default class AtomStore implements IAtomStore {
-  componentSubscriptions: Map<any, Array<AtomStoreListener>>
+  subscriptionsForAtoms: Map<any, Array<AtomStoreListener>>
   batcher: Batcher
   atomValues: Map<any, any>
 
   constructor (defaultAtoms: Map<any, any> = new Map()) {
-    this.componentSubscriptions = new Map()
-    this.batcher = new Batcher(this.notifyChanges.bind(this))
+    this.subscriptionsForAtoms = new Map()
+    this.batcher = new Batcher(this.notifyAtomsChange.bind(this))
     this.atomValues = new Map(defaultAtoms)
   }
 
-  getSubscriptions (key: any): Array<AtomStoreListener> {
-    let subscribers = this.componentSubscriptions.get(key)
+  getAtomSubscriptions (key: any): Array<AtomStoreListener> {
+    let subscribers = this.subscriptionsForAtoms.get(key)
     if (subscribers === undefined) {
       subscribers = []
-      this.componentSubscriptions.set(key, subscribers)
+      this.subscriptionsForAtoms.set(key, subscribers)
     }
     return subscribers
   }
 
-  subscribe (key: any, listener: AtomStoreListener) {
-    const subscribers = this.getSubscriptions(key)
+  subscribeAtom (key: any, listener: AtomStoreListener) {
+    const subscribers = this.getAtomSubscriptions(key)
     subscribers.push(listener)
   }
 
-  unsubscribe (key: any, listener: AtomStoreListener) {
-    const subscribers = this.getSubscriptions(key)
+  unsubscribeAtom (key: any, listener: AtomStoreListener) {
+    const subscribers = this.getAtomSubscriptions(key)
     var index = subscribers.indexOf(listener)
     if (index > -1) {
       subscribers.splice(index, 1)
@@ -57,9 +58,9 @@ export default class AtomStore implements IAtomStore {
     this.batcher.notifyChange(key)
   }
 
-  notifyChanges (keys: Array<any>): void {
+  notifyAtomsChange (keys: Array<any>): void {
     keys.forEach((key: any) => {
-      const listeners = this.getSubscriptions(key)
+      const listeners = this.getAtomSubscriptions(key)
       const newValue = this.getAtomValue(key)
       listeners.forEach(listener => listener(newValue, key))
     })
