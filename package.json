@@ -61,6 +61,7 @@
     "@types/react-dom": "^16.9.8",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.1.0",
+    "generate-changelog": "^1.8.0",
     "jest": "^26.0.1",
     "prettier-standard": "^16.3.0",
     "react": "^16.13.1",
