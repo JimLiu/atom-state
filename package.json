@@ -9,7 +9,8 @@
     "build": "rollup -c",
     "lint": "standard",
     "format": "prettier-standard --format",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "changelog": "generate-changelog"
   },
   "repository": {
     "type": "git",

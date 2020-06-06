@@ -1,3 +1,9 @@
+#### 0.0.4 (2020-06-06)
+
+##### Refactors
+
+*  Rename subscribe functions in AtomStore ([cc1b8acd](https://github.com/JimLiu/atom-state/commit/cc1b8acde34462b862a1a410460a16ab98a95c59))
+
 #### 0.0.3 (2020-06-06)
 
 ##### Continuous Integration
