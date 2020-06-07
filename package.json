@@ -37,13 +37,15 @@
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
     "testPathIgnorePatterns": [
-      "build/"
+      "build/",
+      "examples/"
     ]
   },
   "standard": {
     "ignore": [
       "node_modules/",
-      "build/"
+      "build/",
+      "examples/"
     ],
     "globals": [
       "describe",

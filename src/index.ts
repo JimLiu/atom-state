@@ -3,6 +3,8 @@ import AtomContext from './components/AtomContext'
 import AtomStore, { IAtomStore, AtomStoreListener } from './core/AtomStore'
 import useStore from './hooks/useStore'
 import useAtomState from './hooks/useAtomState'
+import useAtomValue from './hooks/useAtomValue'
+import useSetAtomState from './hooks/useSetAtomState'
 
 import createStore from './utils/createStore'
 
@@ -14,5 +16,7 @@ export {
   IAtomStore,
   AtomStoreListener,
   useStore,
-  useAtomState
+  useAtomState,
+  useAtomValue,
+  useSetAtomState
 }

@@ -1,9 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { AtomRoot } from 'atom-state';
-import './index.css';
-import Counter from './Counter';
-import store from './store';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { AtomRoot } from 'atom-state'
+import './index.css'
+import Counter from './Counter'
+import store from './store'
 
 ReactDOM.render(
   <React.StrictMode>
@@ -12,5 +12,4 @@ ReactDOM.render(
     </AtomRoot>
   </React.StrictMode>,
   document.getElementById('root')
-);
-
+)

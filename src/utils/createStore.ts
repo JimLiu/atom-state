@@ -25,7 +25,7 @@ export default function createStore (
   ) {
     // Array with DefaultAtomType
     atoms = defaultAtoms.reduce((acc, atom) => {
-      if (atom && atom.key && atom.default) {
+      if (atom && atom.key && atom.hasOwnProperty('default')) {
         acc.set(atom.key, atom.default)
       }
       return acc
