@@ -8,10 +8,7 @@ import createStore from '../../utils/createStore'
 import useAtomState from '../useAtomState'
 
 test('useAtomState should return the atom state', () => {
-  const defaultAtoms = new Map()
-  defaultAtoms.set('name', 'Atom')
-
-  const store = createStore(defaultAtoms)
+  const store = createStore({ name: 'Atom' })
 
   const wrapper: FunctionComponent = ({ children }) => (
     <AtomRoot store={store}>{children}</AtomRoot>
@@ -23,10 +20,7 @@ test('useAtomState should return the atom state', () => {
 })
 
 test('useAtomState should set the atom state', async () => {
-  const defaultAtoms = new Map()
-  defaultAtoms.set('name', 'Atom')
-
-  const store = createStore(defaultAtoms)
+  const store = createStore({ name: 'Atom' })
 
   const wrapper: FunctionComponent = ({ children }) => (
     <AtomRoot store={store}>{children}</AtomRoot>
