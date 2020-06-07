@@ -39,11 +39,27 @@ test('useAtomState should set the atom state', async () => {
   expect(result.current[0]).toEqual('Junmin')
 })
 
-test('useAtomState should sync up the atom state between two components', async () => {
-  const defaultAtoms = new Map()
-  defaultAtoms.set('name', 'Atom')
+test('useAtomState should sync up the atom state when it was updated from store', async () => {
+  const store = createStore({ name: 'Atom' })
 
-  const store = createStore(defaultAtoms)
+  const wrapper: FunctionComponent = ({ children }) => (
+    <AtomRoot store={store}>{children}</AtomRoot>
+  )
+
+  const { result, waitForNextUpdate } = renderHook(() => useAtomState('name'), {
+    wrapper
+  })
+
+  await act(async () => {
+    store.setAtomValue('name', 'Junmin')
+    await waitForNextUpdate()
+  })
+
+  expect(result.current[0]).toEqual('Junmin')
+})
+
+test('useAtomState should sync up the atom state between two components', async () => {
+  const store = createStore({ name: 'Atom' })
 
   const Test1Component: FunctionComponent = () => {
     const [name, setName] = useAtomState('name')
