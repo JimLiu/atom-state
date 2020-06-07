@@ -10,7 +10,7 @@ const enqueuePostPromiseJob =
           process.nextTick(fn)
         })
       }
-    : setTimeout
+    : setImmediate || setTimeout
 
 export type NotifyChangesFunc = (keys: Array<any>) => void
 

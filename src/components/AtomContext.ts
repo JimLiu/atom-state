@@ -7,22 +7,21 @@ function notInAContext () {
   )
 }
 
+function notInAContextWithReturn () {
+  notInAContext()
+  return false
+}
+
 export class DefaultAtomStore implements IAtomStore {
-  getAtomValue () {
-    return notInAContext()
-  }
-
-  setAtomValue () {
-    notInAContext()
-  }
-
-  subscribeAtom () {
-    notInAContext()
-  }
-
-  unsubscribeAtom () {
-    notInAContext()
-  }
+  subscribeAtom = notInAContext
+  unsubscribeAtom = notInAContextWithReturn
+  containsAtom = notInAContextWithReturn
+  isAsyncAtom = notInAContextWithReturn
+  getAtomValue = notInAContextWithReturn
+  setAtomValue = notInAContextWithReturn
+  registerAtom = notInAContextWithReturn
+  registerAsyncAtom = notInAContextWithReturn
+  removeAtom = notInAContextWithReturn
 }
 
 const defaultStore = new DefaultAtomStore()
