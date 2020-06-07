@@ -1,26 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import useStore from './useStore'
-
-export type SetAtomValueFunc = (
-  newValue: ((currentValue: any) => any) | any
-) => void
+import useSetAtomState, { SetAtomValueFunc } from './useSetAtomState'
 
 export default function useAtomState (atomKey: any): [any, SetAtomValueFunc] {
   const store = useStore()
   const [, setCounter] = useState(0)
-  const setAtomValue: SetAtomValueFunc = useCallback(
-    newValue => {
-      let newVal
-      if (typeof newValue === 'function') {
-        // get the current value, and pass it to the set function
-        newVal = newValue(store.getAtomValue(atomKey))
-      } else {
-        newVal = newValue
-      }
-      store.setAtomValue(atomKey, newVal)
-    },
-    [store, atomKey]
-  )
+  const setAtomValue: SetAtomValueFunc = useSetAtomState(atomKey)
 
   useEffect(() => {
     const subscriber = () => {

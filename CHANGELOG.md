@@ -2,11 +2,11 @@
 
 ##### Continuous Integration
 
-*  publish npm on release ([a38c288a](https://github.com/JimLiu/atom-state/commit/a38c288a013e76471b673ee2b60c4a7edbd8d157))
+- publish npm on release ([a38c288a](https://github.com/JimLiu/atom-state/commit/a38c288a013e76471b673ee2b60c4a7edbd8d157))
 
 ##### New Features
 
-*  Add new hooks useAtomValue and useSetAtomState ([12f1adba](https://github.com/JimLiu/atom-state/commit/12f1adba873c6d25ffc1080b2c6cbe2d23a2f495))
+- Add new hooks useAtomValue and useSetAtomState ([12f1adba](https://github.com/JimLiu/atom-state/commit/12f1adba873c6d25ffc1080b2c6cbe2d23a2f495))
 
 #### 0.0.7 (2020-06-07)
 
