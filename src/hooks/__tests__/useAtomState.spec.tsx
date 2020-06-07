@@ -39,7 +39,7 @@ test('useAtomState should set the atom state', async () => {
   await act(async () => {
     const [, setName] = result.current
     setName('Junmin')
-    await waitForNextUpdate();
+    await waitForNextUpdate()
   })
 
   expect(result.current[0]).toEqual('Junmin')

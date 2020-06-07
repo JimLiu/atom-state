@@ -15,7 +15,7 @@ const TestComponent: FunctionComponent = () => {
 describe('Throws exception', () => {
   beforeAll(() => {
     global.console.error = () => {}
-  });
+  })
   afterAll(() => {
     global.console.error = consoleError
   })
@@ -31,8 +31,7 @@ describe('Throws exception', () => {
       render(<TestComponent />)
     }).toThrow(/must be used inside a <AtomRoot> component/)
   })
-});
-
+})
 
 test('Does not throw exception when it is used inside a AtomRoot with a store value', () => {
   const store = createStore()
