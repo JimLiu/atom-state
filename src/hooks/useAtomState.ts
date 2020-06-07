@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import useStore from './useStore'
 
-type SetAtomValueFunc = (newValue: ((currentValue: any) => any) | any) => void
+export type SetAtomValueFunc = (
+  newValue: ((currentValue: any) => any) | any
+) => void
 
 export default function useAtomState (atomKey: any): [any, SetAtomValueFunc] {
   const store = useStore()

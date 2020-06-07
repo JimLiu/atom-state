@@ -4,15 +4,15 @@
 
 ##### Chores
 
-*  add release scripts ([68a05380](https://github.com/JimLiu/atom-state/commit/68a053803ea92285c5f1025d4a33347a3179f8b0))
+- add release scripts ([68a05380](https://github.com/JimLiu/atom-state/commit/68a053803ea92285c5f1025d4a33347a3179f8b0))
 
 ##### Documentation Changes
 
-*  Update changelog ([f750e32f](https://github.com/JimLiu/atom-state/commit/f750e32f84d58b2f5f92d85e62c036b89c7a0b5e))
+- Update changelog ([f750e32f](https://github.com/JimLiu/atom-state/commit/f750e32f84d58b2f5f92d85e62c036b89c7a0b5e))
 
 ##### New Features
 
-*  Support Async Atom ([83cf3fbf](https://github.com/JimLiu/atom-state/commit/83cf3fbf6d5e9fb78a0dda5f5cc22ea612a886b2))
+- Support Async Atom ([83cf3fbf](https://github.com/JimLiu/atom-state/commit/83cf3fbf6d5e9fb78a0dda5f5cc22ea612a886b2))
 
 #### 0.0.5 (2020-06-06)
 
