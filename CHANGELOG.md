@@ -2,11 +2,11 @@
 
 ##### Chores
 
-*  Add badges ([68b2a03c](https://github.com/JimLiu/atom-state/commit/68b2a03c3df660b72f3e743efcee6740b4986fcb))
+- Add badges ([68b2a03c](https://github.com/JimLiu/atom-state/commit/68b2a03c3df660b72f3e743efcee6740b4986fcb))
 
 ##### Bug Fixes
 
-*  useSetAtomState should not cause re-render ([7a4fe2c6](https://github.com/JimLiu/atom-state/commit/7a4fe2c6a3fb7d4096d82a18d44344dadf96692d))
+- useSetAtomState should not cause re-render ([7a4fe2c6](https://github.com/JimLiu/atom-state/commit/7a4fe2c6a3fb7d4096d82a18d44344dadf96692d))
 
 #### 0.0.8 (2020-06-07)
 

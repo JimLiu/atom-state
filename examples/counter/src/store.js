@@ -1,7 +1,7 @@
-import { createStore } from 'atom-state';
+import { createStore } from 'atom-state'
 
 // initialize the default atoms by an object
-const store = createStore({ count: 0 });
+const store = createStore({ count: 0 })
 
 /*
 // initialize the default atoms by an array
@@ -14,4 +14,4 @@ const store = createStore([
 ]);
 */
 
-export default store;
+export default store
