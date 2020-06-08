@@ -2,12 +2,12 @@
 
 ##### Documentation Changes
 
-*  Add counter example ([cafc51e1](https://github.com/JimLiu/atom-state/commit/cafc51e1dad25848802ec8372e70f3c196e74350))
+- Add counter example ([cafc51e1](https://github.com/JimLiu/atom-state/commit/cafc51e1dad25848802ec8372e70f3c196e74350))
 
 ##### Bug Fixes
 
-*  ignore /examples for lint ([89190451](https://github.com/JimLiu/atom-state/commit/89190451b6343d41de0aa7edf09ca2fa38b78695))
-*  fixed issue that can't create atom default value with 0 ([26aaae70](https://github.com/JimLiu/atom-state/commit/26aaae70dd07027f90913ad737a53fd80a53251e))
+- ignore /examples for lint ([89190451](https://github.com/JimLiu/atom-state/commit/89190451b6343d41de0aa7edf09ca2fa38b78695))
+- fixed issue that can't create atom default value with 0 ([26aaae70](https://github.com/JimLiu/atom-state/commit/26aaae70dd07027f90913ad737a53fd80a53251e))
 
 ### 0.1.0 (2020-06-07)
 
