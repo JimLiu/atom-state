@@ -1,3 +1,13 @@
+#### 0.1.2 (2020-06-08)
+
+##### Documentation Changes
+
+*  Add todos example ([94b4d16d](https://github.com/JimLiu/atom-state/commit/94b4d16df27fdd95bcb15b0a1c2a3cef9dfb0ec7))
+
+##### Refactors
+
+*  Use Set for AtomStoreListener ([b1769c02](https://github.com/JimLiu/atom-state/commit/b1769c02025585d0888997dabe8cbb84da38766f))
+
 #### 0.1.1 (2020-06-07)
 
 ##### Documentation Changes
