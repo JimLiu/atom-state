@@ -30,7 +30,7 @@ export interface IAtomStore {
 
 export default class AtomStore implements IAtomStore {
   // all the subscriptions for atoms change
-  subscriptionsForAtoms: Map<any, Array<AtomStoreListener>>
+  subscriptionsForAtoms: Map<any, Set<AtomStoreListener>>
 
   // a batch helper to merge notifications
   batcher: Batcher
@@ -52,10 +52,10 @@ export default class AtomStore implements IAtomStore {
    * get all the liseners for an atom key
    * @param key - Atom key
    */
-  getAtomSubscriptions (key: any): Array<AtomStoreListener> {
+  getAtomSubscriptions (key: any): Set<AtomStoreListener> {
     let subscribers = this.subscriptionsForAtoms.get(key)
     if (subscribers === undefined) {
-      subscribers = []
+      subscribers = new Set()
       this.subscriptionsForAtoms.set(key, subscribers)
     }
     return subscribers
@@ -68,7 +68,7 @@ export default class AtomStore implements IAtomStore {
    */
   subscribeAtom (key: any, listener: AtomStoreListener) {
     const subscribers = this.getAtomSubscriptions(key)
-    subscribers.push(listener)
+    subscribers.add(listener)
   }
 
   /**
@@ -78,11 +78,11 @@ export default class AtomStore implements IAtomStore {
    */
   unsubscribeAtom (key: any, listener: AtomStoreListener): boolean {
     const subscribers = this.getAtomSubscriptions(key)
-    var index = subscribers.indexOf(listener)
-    if (index > -1) {
-      subscribers.splice(index, 1)
-      return true
+    if (!subscribers.has(listener)) {
+      return false
     }
+
+    subscribers.delete(listener)
     return false
   }
 
