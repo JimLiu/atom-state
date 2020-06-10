@@ -1,5 +1,9 @@
 ### 0.2.0 (2020-06-10)
 
+##### New Features
+
+- Merge `registerAtom`, `registerAsyncAtom` with `setAtom` ([def9eb17](https://github.com/JimLiu/atom-state/commit/def9eb17dfb71e878cbe071bf0d04684aaa15d6b))
+
 #### 0.1.2 (2020-06-08)
 
 ##### Documentation Changes
