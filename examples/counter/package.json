@@ -6,7 +6,7 @@
     "@testing-library/jest-dom": "^5.9.0",
     "@testing-library/react": "^10.2.0",
     "@testing-library/react-hooks": "^3.3.0",
-    "atom-state": "^0.1.1",
+    "atom-state": "^0.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
