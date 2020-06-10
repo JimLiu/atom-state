@@ -16,11 +16,13 @@ export class DefaultAtomStore implements IAtomStore {
   subscribeAtom = notInAContext
   unsubscribeAtom = notInAContextWithReturn
   containsAtom = notInAContextWithReturn
-  isAsyncAtom = notInAContextWithReturn
+  isAtomPromise = notInAContextWithReturn
   getAtomValue = notInAContextWithReturn
+  getAtomPromise = () => {
+    notInAContext()
+    return undefined
+  }
   setAtomValue = notInAContextWithReturn
-  registerAtom = notInAContextWithReturn
-  registerAsyncAtom = notInAContextWithReturn
   removeAtom = notInAContextWithReturn
 }
 

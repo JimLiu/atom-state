@@ -16,9 +16,20 @@ test('AtomContext has a default store value', () => {
   expect(getByText(/^true/)).toHaveTextContent('true')
 })
 
-const TestComponent: FunctionComponent = () => {
+type TestComponentProps = {
+  atomKey: string
+}
+
+const TestComponent: FunctionComponent<TestComponentProps> = ({ atomKey }) => {
   const store = useContext(AtomContext)
-  return <span>{store.getAtomValue('name')}</span>
+  const promise = store.getAtomPromise(atomKey)
+  return (
+    <span>
+      {store.getAtomValue(atomKey)}
+      {promise}
+      {store.containsAtom(atomKey)}
+    </span>
+  )
 }
 
 describe('Throws exception', () => {
@@ -31,7 +42,13 @@ describe('Throws exception', () => {
 
   test('AtomContext throws exception when it has a default store value', () => {
     expect(() => {
-      render(<TestComponent />)
+      render(<TestComponent atomKey='name' />)
+    }).toThrow(/must be used inside a <AtomRoot> component/)
+  })
+
+  test('AtomContext throws exception when it has a default store value', () => {
+    expect(() => {
+      render(<TestComponent atomKey='name' />)
     }).toThrow(/must be used inside a <AtomRoot> component/)
   })
 })
@@ -41,7 +58,7 @@ test('AtomContext does not throw exception when it is passed a store value', () 
   expect(() => {
     render(
       <AtomContext.Provider value={store}>
-        <TestComponent />
+        <TestComponent atomKey='name' />
       </AtomContext.Provider>
     )
   }).not.toThrowError()

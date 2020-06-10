@@ -1,6 +1,8 @@
 import AtomStore from '../AtomStore'
 import createStore from '../../utils/createStore'
 
+const nextTick = () => new Promise(resolve => setImmediate(resolve))
+
 describe('new AtomStore()', () => {
   test('AtomStore can be initialized with empty param', () => {
     const store = new AtomStore()
@@ -15,29 +17,78 @@ describe('new AtomStore()', () => {
 })
 
 describe('getAtomValue()', () => {
-  test('get an atom value by key', () => {
+  test('should return an atom value by key', () => {
     const store = createStore({ foo: 'bar' })
     expect(store.getAtomValue('foo')).toEqual('bar')
   })
 
-  test('get an async atom value by key', () => {
+  test('should return undefined for a promise atom without fallback and does not return result', () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve('bar'))
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
     expect(store.getAtomValue('foo')).toBeUndefined()
   })
 
-  test('get an fallback value for an async atom', () => {
+  test('should return an fallback value for a promise atom with fallback', () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve('bar'), 'loading')
+    store.setAtomValue('foo', Promise.resolve('bar'), {
+      isAsync: true,
+      fallback: 'loading'
+    })
     expect(store.getAtomValue('foo')).toBe('loading')
   })
 
-  test('get a loaded async atom value by key', async () => {
+  test('should return the promise value after the promise resolved', async () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve('bar'))
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
     expect(store.getAtomValue('foo')).toBeUndefined()
-    await (() => new Promise(resolve => setImmediate(resolve)))
+    await nextTick()
     expect(store.getAtomValue('foo')).toEqual('bar')
+  })
+
+  test("should return undefined if key doesn's exist", () => {
+    const store = createStore({ foo: 'bar' })
+    expect(store.getAtomValue('bar')).toBeUndefined()
+  })
+})
+
+describe('getAtomPromise()', () => {
+  test('should return a promise for a value', () => {
+    const store = createStore({ foo: 'bar' })
+    expect(store.getAtomPromise('foo') instanceof Promise).toBe(true)
+  })
+
+  test('should return a promise for a promise', () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    expect(store.getAtomPromise('foo') instanceof Promise).toBe(true)
+  })
+
+  test("should return undefined if key doesn's exist", () => {
+    const store = createStore()
+    expect(store.getAtomPromise('foo1')).toBeUndefined()
+  })
+
+  test('should resolve a result', () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    expect(store.getAtomPromise('foo')).resolves.toBe('bar')
+  })
+
+  test('should reject an error', () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.reject('error'))
+    expect(store.getAtomPromise('foo')).rejects.toBe('error')
+  })
+
+  test('should reject an error with fallback error message', async () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.reject('error'), {
+      isAsync: true,
+      fallback: () => 'failed'
+    })
+
+    await nextTick()
+    expect(store.getAtomPromise('foo')).rejects.toEqual('error')
   })
 })
 
@@ -48,64 +99,83 @@ describe('setAtomValue()', () => {
     expect(store.getAtomValue('foo')).toEqual('new bar')
   })
 
-  test('should not set an atom value if key does not exists', () => {
-    const store = createStore({ bar: 'foo' })
+  test('should override the existed atom value if key exists', () => {
+    const store = createStore()
     store.setAtomValue('foo', 'bar')
-    expect(store.getAtomValue('foo')).toBeUndefined()
+    store.setAtomValue('foo', 'foo')
+    expect(store.getAtomValue('foo')).toBe('foo')
   })
 
-  test('should not set an atom value for an async atom', () => {
+  test('should delete the atom promise after set a new no-promise value', () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve('bar'), 'loading')
+    store.setAtomValue('foo', Promise.resolve('bar'), {
+      isAsync: true,
+      fallback: 'loading'
+    })
+    expect(store.isAtomPromise('foo')).toBe(true)
     store.setAtomValue('foo', 'bar')
+    expect(store.getAtomValue('foo')).toBe('bar')
+    expect(store.isAtomPromise('foo')).toBe(false)
+  })
+
+  test('should add a atom promise after set a new promise value', () => {
+    const store = createStore()
+    store.setAtomValue('foo', 'bar')
+    expect(store.getAtomValue('foo')).toBe('bar')
+    expect(store.isAtomPromise('foo')).toBe(false)
+    store.setAtomValue('foo', Promise.resolve('bar'), {
+      isAsync: true,
+      fallback: 'loading'
+    })
+    expect(store.isAtomPromise('foo')).toBe(true)
     expect(store.getAtomValue('foo')).toBe('loading')
   })
 })
 
 describe('subscribeAtom()', () => {
-  test('AtomStore can subscribe the atom value change', () => {
+  test('should subscribe the atom value change', async () => {
     const store = createStore({ foo: 'bar' })
-    store.subscribeAtom('foo', value => {
-      expect(value).toEqual('new bar')
+    return new Promise(resolve => {
+      store.subscribeAtom('foo', value => {
+        expect(value).toEqual('new bar')
+        resolve()
+      })
+      store.setAtomValue('foo', 'new bar')
     })
-    store.setAtomValue('foo', 'new bar')
   })
 
-  test('AtomStore call lisener once after the atom value change', () => {
+  test('should call lisener once after the atom value change', async () => {
     const mockLisener = jest.fn()
     const store = createStore({ foo: 'bar' })
     store.subscribeAtom('foo', mockLisener)
     store.setAtomValue('foo', 'new bar')
 
-    setTimeout(() => {
-      expect(mockLisener.mock.calls.length).toBe(1)
-    })
+    await nextTick()
+    expect(mockLisener.mock.calls.length).toBe(1)
   })
 })
 
 describe('unsubscribeAtom()', () => {
-  test('AtomStore can unsubscribe the atom value change', () => {
+  test('should unsubscribe the atom value change', async () => {
     const mockLisener = jest.fn()
     const store = createStore({ foo: 'bar' })
     store.subscribeAtom('foo', mockLisener)
     store.unsubscribeAtom('foo', mockLisener)
     store.setAtomValue('foo', 'new bar')
 
-    setTimeout(() => {
-      expect(mockLisener.mock.calls.length).toBe(0)
-    })
+    await nextTick()
+    expect(mockLisener.mock.calls.length).toBe(0)
   })
 
-  test('AtomStore unsubscribe a not subscribed key', () => {
+  test('should unsubscribe a not subscribed key', async () => {
     const store = createStore({ foo: 'bar' })
 
     const mockLisener = jest.fn()
     store.unsubscribeAtom('foo', mockLisener)
     store.setAtomValue('foo', 'new bar')
 
-    setTimeout(() => {
-      expect(mockLisener.mock.calls.length).toBe(0)
-    })
+    await nextTick()
+    expect(mockLisener.mock.calls.length).toBe(0)
   })
 })
 
@@ -120,23 +190,23 @@ describe('containsAtom()', () => {
 describe('isAsyncAtom()', () => {
   test('return false for a normal atom', () => {
     const store = createStore({ foo: 'bar' })
-    expect(store.isAsyncAtom('foo')).toBe(false)
+    expect(store.isAtomPromise('foo')).toBe(false)
   })
 
   test('return false for a not exist atom', () => {
     const store = createStore({ foo: 'bar' })
-    expect(store.isAsyncAtom('bar')).toBe(false)
+    expect(store.isAtomPromise('bar')).toBe(false)
   })
 
   test('return true for a sync atom', () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve())
-    expect(store.isAsyncAtom('foo')).toBe(true)
+    store.setAtomValue('foo', Promise.resolve(), { isAsync: true })
+    expect(store.isAtomPromise('foo')).toBe(true)
   })
 })
 
-describe('notifyAtomsChange()', () => {
-  test('AtomStore notifies changes', () => {
+describe('_notifyAtomsChange()', () => {
+  test('AtomStore notifies changes', async () => {
     let atomValues = new Map([
       ['foo', 'bar'],
       ['bar', 'foo']
@@ -147,66 +217,36 @@ describe('notifyAtomsChange()', () => {
     const store = new AtomStore(atomValues)
     store.subscribeAtom('foo', mockFooLisener)
     store.subscribeAtom('bar', mockBarLisener)
-    store.notifyAtomsChange(['foo', 'bar'])
+    store._notifyAtomsChange(['foo', 'bar'])
 
-    setTimeout(() => {
-      expect(mockFooLisener.mock.calls.length).toBe(1)
-      expect(mockBarLisener.mock.calls.length).toBe(1)
-    })
+    await nextTick()
+    expect(mockFooLisener.mock.calls.length).toBe(1)
+    expect(mockBarLisener.mock.calls.length).toBe(1)
   })
 })
 
-describe('registerAtom()', () => {
-  test('should register an atom', () => {
-    const store = createStore({ foo: 'bar' })
-    expect(store.getAtomValue('bar')).toBeUndefined()
-
-    store.registerAtom('bar', 'foo')
-    expect(store.getAtomValue('bar')).toBe('foo')
-  })
-
-  test('should not register an atom if key exists', () => {
-    const store = createStore({ foo: 'bar' })
-
-    const result = store.registerAtom('foo', 'foo')
-    expect(result).toBe(false)
-    expect(store.getAtomValue('foo')).toBe('bar')
-  })
-})
-
-describe('registerAsyncAtom()', () => {
-  test('should register an async atom', () => {
+describe('setAtomValue() with Promise', () => {
+  test('should register an async atom', async () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve('bar'))
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
     expect(store.containsAtom('foo')).toBe(true)
-    expect(store.isAsyncAtom('foo')).toBe(true)
+    expect(store.isAtomPromise('foo')).toBe(true)
     expect(store.getAtomValue('foo')).toBeUndefined()
-    setTimeout(() => {
-      expect(store.getAtomValue('foo')).toBe('bar')
-    })
-  })
 
-  test('should not register an async atom if key exists', () => {
-    const store = createStore({ foo: 'bar' })
-
-    const result = store.registerAsyncAtom('foo', Promise.resolve('bar'))
-    expect(result).toBe(false)
+    await nextTick()
     expect(store.getAtomValue('foo')).toBe('bar')
-    expect(store.isAsyncAtom('foo')).toBe(false)
   })
 
-  test('should register an async atom with Promise.reject', () => {
+  test('should register an async atom with Promise.reject', async () => {
     const store = createStore()
-    store.registerAsyncAtom(
-      'foo',
-      Promise.reject('bar'),
-      (status: any) => status
-    )
+    store.setAtomValue('foo', Promise.reject('bar'), {
+      isAsync: true,
+      fallback: (status: any) => status
+    })
 
     expect(store.getAtomValue('foo')).toBe('loading')
-    setTimeout(() => {
-      expect(store.getAtomValue('foo')).toBe('failed')
-    })
+    await nextTick()
+    expect(store.getAtomValue('foo')).toBe('failed')
   })
 })
 
@@ -217,12 +257,12 @@ describe('removeAtom()', () => {
     expect(store.containsAtom('foo')).toBe(false)
   })
 
-  test('should remove an exist async atom', () => {
+  test('should remove an exist atom promise', () => {
     const store = createStore()
-    store.registerAsyncAtom('foo', Promise.resolve('bar'))
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
     store.removeAtom('foo')
     expect(store.containsAtom('foo')).toBe(false)
-    expect(store.isAsyncAtom('foo')).toBe(false)
+    expect(store.isAtomPromise('foo')).toBe(false)
   })
 
   test('should not remove a not exist atom', () => {

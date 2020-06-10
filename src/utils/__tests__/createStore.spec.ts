@@ -4,7 +4,7 @@ import AtomStore from '../../core/AtomStore'
 test('create store with empty parms', () => {
   let store = createStore()
   expect(store instanceof AtomStore).toBe(true)
-  expect(store.atomValues.size).toBe(0)
+  expect(store._atomValues.size).toBe(0)
 })
 
 test('create store with a Map', () => {
@@ -15,7 +15,7 @@ test('create store with a Map', () => {
   let store = createStore(atoms)
   expect(store instanceof AtomStore).toBe(true)
   expect(store instanceof AtomStore).toBe(true)
-  expect(store.atomValues.size).toBe(2)
+  expect(store._atomValues.size).toBe(2)
 })
 
 describe('create store with an object parms', () => {
@@ -26,7 +26,7 @@ describe('create store with an object parms', () => {
     })
     expect(store instanceof AtomStore).toBe(true)
     expect(store instanceof AtomStore).toBe(true)
-    expect(store.atomValues.size).toBe(2)
+    expect(store._atomValues.size).toBe(2)
   })
 
   test('should create with a null/0 value', () => {
@@ -36,7 +36,7 @@ describe('create store with an object parms', () => {
     })
     expect(store instanceof AtomStore).toBe(true)
     expect(store instanceof AtomStore).toBe(true)
-    expect(store.atomValues.size).toBe(2)
+    expect(store._atomValues.size).toBe(2)
   })
 })
 
@@ -65,7 +65,7 @@ describe('create store with an DefaultAtomType', () => {
       }
     ])
     expect(store instanceof AtomStore).toBe(true)
-    expect(store.atomValues.size).toBe(5)
+    expect(store._atomValues.size).toBe(5)
   })
 
   test('create store with a null/0/ default value', () => {
@@ -84,7 +84,7 @@ describe('create store with an DefaultAtomType', () => {
       }
     ])
     expect(store instanceof AtomStore).toBe(true)
-    expect(store.atomValues.size).toBe(3)
+    expect(store._atomValues.size).toBe(3)
   })
 })
 
@@ -95,5 +95,5 @@ test('create store with an array', () => {
   ])
   expect(store instanceof AtomStore).toBe(true)
   expect(store instanceof AtomStore).toBe(true)
-  expect(store.atomValues.size).toBe(2)
+  expect(store._atomValues.size).toBe(2)
 })

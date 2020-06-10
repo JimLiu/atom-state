@@ -2,13 +2,21 @@ import Batcher from './Batcher'
 
 export type AtomStoreListener = (newValue: any, key: any) => void
 
-export type AsyncAtomFallbackType = ((status: string) => any) | any
+export type AtomPromiseFallbackType =
+  | ((status: string, error?: Error) => any)
+  | any
 
-export type AsyncAtomType = {
-  status: 'loading' | 'success' | 'failed'
+export type AtomValueOption = {
+  fallback?: AtomPromiseFallbackType
+  isAsync?: boolean
+}
+
+export type AtomPromiseStatus = 'loading' | 'success' | 'failed'
+
+export type AtomPromiseType = {
+  status: AtomPromiseStatus
   promise: Promise<any>
   contents: any
-  fallback?: AsyncAtomFallbackType
   error?: Error
 }
 
@@ -16,47 +24,42 @@ export interface IAtomStore {
   subscribeAtom: (key: any, listener: AtomStoreListener) => void
   unsubscribeAtom: (key: any, listener: AtomStoreListener) => boolean
   containsAtom(key: any): boolean
-  isAsyncAtom(key: any): boolean
+  isAtomPromise(key: any): boolean
   getAtomValue: (key: any) => any
-  setAtomValue: (key: any, newValue: any) => boolean
-  registerAtom(key: any, defaultValue: any): boolean
-  registerAsyncAtom(
-    key: any,
-    defaultValue: Promise<any>,
-    fallback?: AsyncAtomFallbackType
-  ): boolean
+  getAtomPromise(key: any): Promise<any> | undefined
+  setAtomValue: (key: any, newValue: any, option?: AtomValueOption) => boolean
   removeAtom(key: any): boolean
 }
 
 export default class AtomStore implements IAtomStore {
   // all the subscriptions for atoms change
-  subscriptionsForAtoms: Map<any, Set<AtomStoreListener>>
+  _subscriptionsForAtoms: Map<any, Set<AtomStoreListener>>
 
   // a batch helper to merge notifications
-  batcher: Batcher
+  _batcher: Batcher
 
   // all the atoms
-  atomValues: Map<any, any>
+  _atomValues: Map<any, any>
 
-  // indentify the async atoms by storing their keys to asyncAtomKeys
-  asyncAtomKeys: Set<any>
+  // save the promises and statuses
+  _atomPromises: Map<any, AtomPromiseType>
 
   constructor (defaultAtoms: Map<any, any> = new Map()) {
-    this.subscriptionsForAtoms = new Map()
-    this.batcher = new Batcher(this.notifyAtomsChange.bind(this))
-    this.atomValues = new Map(defaultAtoms)
-    this.asyncAtomKeys = new Set()
+    this._subscriptionsForAtoms = new Map()
+    this._batcher = new Batcher(this._notifyAtomsChange.bind(this))
+    this._atomValues = new Map(defaultAtoms)
+    this._atomPromises = new Map()
   }
 
   /**
    * get all the liseners for an atom key
    * @param key - Atom key
    */
-  getAtomSubscriptions (key: any): Set<AtomStoreListener> {
-    let subscribers = this.subscriptionsForAtoms.get(key)
+  _getAtomSubscriptions (key: any): Set<AtomStoreListener> {
+    let subscribers = this._subscriptionsForAtoms.get(key)
     if (subscribers === undefined) {
       subscribers = new Set()
-      this.subscriptionsForAtoms.set(key, subscribers)
+      this._subscriptionsForAtoms.set(key, subscribers)
     }
     return subscribers
   }
@@ -67,7 +70,7 @@ export default class AtomStore implements IAtomStore {
    * @param listener - the lisener function to receive the atom changes
    */
   subscribeAtom (key: any, listener: AtomStoreListener) {
-    const subscribers = this.getAtomSubscriptions(key)
+    const subscribers = this._getAtomSubscriptions(key)
     subscribers.add(listener)
   }
 
@@ -77,7 +80,7 @@ export default class AtomStore implements IAtomStore {
    * @param listener - the lisener function you want to unsubscribe
    */
   unsubscribeAtom (key: any, listener: AtomStoreListener): boolean {
-    const subscribers = this.getAtomSubscriptions(key)
+    const subscribers = this._getAtomSubscriptions(key)
     if (!subscribers.has(listener)) {
       return false
     }
@@ -91,15 +94,15 @@ export default class AtomStore implements IAtomStore {
    * @param key - Atom key
    */
   containsAtom (key: any): boolean {
-    return this.atomValues.has(key)
+    return this._atomValues.has(key)
   }
 
   /**
-   * Check if the atom is async
+   * Check if the atom contains a promise
    * @param key - Atom key
    */
-  isAsyncAtom (key: any): boolean {
-    return this.asyncAtomKeys.has(key)
+  isAtomPromise (key: any): boolean {
+    return this._atomPromises.has(key)
   }
 
   /**
@@ -107,24 +110,97 @@ export default class AtomStore implements IAtomStore {
    * @param key - Atom key
    */
   getAtomValue (key: any): any {
-    const atomValue = this.atomValues.get(key)
+    return this._atomValues.get(key)
+  }
 
-    // return result directly if it's not async atom
-    if (!this.isAsyncAtom(key)) {
-      return atomValue
+  /**
+   * Get a Promise for the atom value
+   * @param key - Atom key
+   */
+  getAtomPromise (key: any): Promise<any> | undefined {
+    const content: any = this.getAtomValue(key)
+    const atomPromise = this._atomPromises.get(key)
+
+    // The atom value is NOT a promise or has already gotten the result
+    // return the content with a Promise
+    if (
+      (!this.isAtomPromise(key) && this.containsAtom(key)) ||
+      atomPromise?.status === 'success'
+    ) {
+      return Promise.resolve(content)
     }
 
-    const { status, contents, fallback } = atomValue
-
-    if (status === 'success') {
-      return contents
+    if (atomPromise?.status === 'failed') {
+      return Promise.reject(atomPromise?.error)
     }
 
+    return atomPromise?.promise
+  }
+
+  /**
+   * Get the fallback value for a promise
+   * @param fallback - fallback value for loading or error status
+   * could be a value or a function which accept a status param
+   * @param status - the Promise status: loading, success, failed
+   */
+  _getFallbackValue (
+    fallback: AtomPromiseFallbackType,
+    status: AtomPromiseStatus,
+    error?: Error
+  ): any {
     if (typeof fallback === 'function') {
-      return fallback(status) // return different result by status
+      return fallback(status, error)
     }
 
     return fallback
+  }
+
+  /**
+   * _setAtomPromise
+   * @param key - Atom key
+   * @param promise - The atom value, should be a Promise
+   * @param fallback - fallback value for loading status or error status
+   *    fallback could be a value or a function which return a value base on status
+   */
+  _setAtomPromise (
+    key: any,
+    promise: Promise<any>,
+    fallback: AtomPromiseFallbackType
+  ) {
+    const atomPromise: AtomPromiseType = {
+      status: 'loading',
+      promise,
+      contents: null,
+      error: undefined
+    }
+
+    // set the content as a fallback value
+    this._atomValues.set(key, this._getFallbackValue(fallback, 'loading'))
+    this._atomPromises.set(key, atomPromise)
+
+    const updateAtomPromise = (
+      status: AtomPromiseStatus,
+      newAtomValue: any,
+      error?: Error
+    ) => {
+      // make sure the promise exists and didn't change
+      if (this._atomPromises.get(key) === atomPromise) {
+        atomPromise.status = status
+        atomPromise.error = error
+        // update atom value and notice change
+        this.setAtomValue(key, newAtomValue)
+        this._atomPromises.set(key, atomPromise)
+      }
+    }
+
+    promise
+      .then(result => {
+        updateAtomPromise('success', result)
+      })
+      .catch(error => {
+        const newAtomValue = this._getFallbackValue(fallback, 'failed', error)
+        updateAtomPromise('failed', newAtomValue, error)
+      })
   }
 
   /**
@@ -132,13 +208,20 @@ export default class AtomStore implements IAtomStore {
    * @param key - Atom key
    * @param newValue - The new atom value
    */
-  setAtomValue (key: any, newValue: any): boolean {
-    // won't set an atom value if the key does not exist or it's async
-    if (!this.atomValues.has(key) || this.isAsyncAtom(key)) {
-      return false
+  setAtomValue (key: any, newValue: any, option?: AtomValueOption): boolean {
+    // is async
+    if (option?.isAsync) {
+      this._setAtomPromise(key, Promise.resolve(newValue), option?.fallback)
+      return true
     }
-    this.atomValues.set(key, newValue)
-    this.batcher.notifyChange(key)
+
+    // delete the old promise if the new value is not an async
+    if (this.isAtomPromise(key)) {
+      this._atomPromises.delete(key)
+    }
+
+    this._atomValues.set(key, newValue)
+    this._batcher.notifyChange(key)
     return true
   }
 
@@ -146,89 +229,12 @@ export default class AtomStore implements IAtomStore {
    * Batch notification to the atom liseners
    * @param keys - The atom keys which changed value
    */
-  notifyAtomsChange (keys: Array<any>): void {
+  _notifyAtomsChange (keys: Array<any>): void {
     keys.forEach((key: any) => {
-      const listeners = this.getAtomSubscriptions(key)
+      const listeners = this._getAtomSubscriptions(key)
       const newValue = this.getAtomValue(key)
       listeners.forEach(listener => listener(newValue, key))
     })
-  }
-
-  /**
-   * register an atom by key and value
-   * @param key - Atom key
-   * @param defaultValue - default value
-   * @returns
-   *    true: registered the atom
-   *    false: the key has existed
-   */
-  registerAtom (key: any, defaultValue: any): boolean {
-    if (this.atomValues.has(key)) {
-      return false
-    }
-
-    this.atomValues.set(key, defaultValue)
-
-    return false
-  }
-
-  registerAsyncAtom (
-    key: any,
-    defaultValue: Promise<any> | any,
-    fallback?: AsyncAtomFallbackType
-  ): boolean {
-    if (this.atomValues.has(key)) {
-      return false
-    }
-
-    // make sure the default value is a Promise
-    let promise = Promise.resolve(defaultValue)
-
-    let atomValue: AsyncAtomType = {
-      status: 'loading',
-      promise,
-      contents: null,
-      fallback
-    }
-
-    // add the key to `asyncAtomKeys`
-    this.asyncAtomKeys.add(key)
-
-    // set atom value
-    this.atomValues.set(key, atomValue)
-
-    const updateAtomValue = (atomValue: AsyncAtomType) => {
-      if (this.atomValues.has(key)) {
-        // might be removed
-        this.atomValues.set(key, atomValue)
-        this.batcher.notifyChange(key)
-      }
-    }
-
-    promise
-      .then(result => {
-        atomValue = {
-          status: 'success', // set status to `success`
-          promise,
-          contents: result, // set contents to the result of promise
-          fallback
-        }
-        updateAtomValue(atomValue)
-      })
-      .catch(error => {
-        atomValue = {
-          status: 'failed',
-          promise,
-          contents: null,
-          fallback,
-          error
-        }
-        updateAtomValue(atomValue)
-
-        throw error
-      })
-
-    return false
   }
 
   /**
@@ -236,14 +242,12 @@ export default class AtomStore implements IAtomStore {
    * @param key - Atom key
    */
   removeAtom (key: any): boolean {
-    if (!this.atomValues.has(key)) {
-      return false
-    }
+    const result = this._atomValues.has(key)
 
-    this.asyncAtomKeys.delete(key)
-    this.atomValues.delete(key)
-    this.subscriptionsForAtoms.delete(key)
+    this._atomPromises.delete(key)
+    this._atomValues.delete(key)
+    this._subscriptionsForAtoms.delete(key)
 
-    return true
+    return result
   }
 }
