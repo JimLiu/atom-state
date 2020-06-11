@@ -24,7 +24,7 @@ describe('getAtomValue()', () => {
 
   test('should return undefined for a promise atom without fallback and does not return result', () => {
     const store = createStore()
-    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    store.setAtomValue('foo', Promise.resolve('bar'))
     expect(store.getAtomValue('foo')).toBeUndefined()
   })
 
@@ -39,7 +39,7 @@ describe('getAtomValue()', () => {
 
   test('should return the promise value after the promise resolved', async () => {
     const store = createStore()
-    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    store.setAtomValue('foo', Promise.resolve('bar'))
     expect(store.getAtomValue('foo')).toBeUndefined()
     await nextTick()
     expect(store.getAtomValue('foo')).toEqual('bar')
@@ -59,7 +59,7 @@ describe('getAtomPromise()', () => {
 
   test('should return a promise for a promise', () => {
     const store = createStore()
-    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    store.setAtomValue('foo', Promise.resolve('bar'))
     expect(store.getAtomPromise('foo') instanceof Promise).toBe(true)
   })
 
@@ -70,7 +70,7 @@ describe('getAtomPromise()', () => {
 
   test('should resolve a result', () => {
     const store = createStore()
-    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    store.setAtomValue('foo', Promise.resolve('bar'))
     expect(store.getAtomPromise('foo')).resolves.toBe('bar')
   })
 
@@ -248,6 +248,24 @@ describe('setAtomValue() with Promise', () => {
     await nextTick()
     expect(store.getAtomValue('foo')).toBe('failed')
   })
+
+  test('should register a Promise as an async atom by default', async () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.resolve('bar'))
+    expect(store.isAtomPromise('foo')).toBe(true)
+  })
+
+  test('should NOT register a Promise as an async atom if set option.isAsync is false', async () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: false })
+    expect(store.isAtomPromise('foo')).toBe(false)
+  })
+
+  test('should register a value as an async atom if set option.isAsync is true ', async () => {
+    const store = createStore()
+    store.setAtomValue('foo', 'bar', { isAsync: true })
+    expect(store.isAtomPromise('foo')).toBe(true)
+  })
 })
 
 describe('removeAtom()', () => {
@@ -259,7 +277,7 @@ describe('removeAtom()', () => {
 
   test('should remove an exist atom promise', () => {
     const store = createStore()
-    store.setAtomValue('foo', Promise.resolve('bar'), { isAsync: true })
+    store.setAtomValue('foo', Promise.resolve('bar'))
     store.removeAtom('foo')
     expect(store.containsAtom('foo')).toBe(false)
     expect(store.isAtomPromise('foo')).toBe(false)

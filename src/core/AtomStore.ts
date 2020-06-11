@@ -210,7 +210,10 @@ export default class AtomStore implements IAtomStore {
    */
   setAtomValue (key: any, newValue: any, option?: AtomValueOption): boolean {
     // is async
-    if (option?.isAsync) {
+    if (
+      (newValue instanceof Promise && option?.isAsync !== false) || // Promise is async by default, unless it's marked as not async
+      option?.isAsync // or it's marked as async
+    ) {
       this._setAtomPromise(key, Promise.resolve(newValue), option?.fallback)
       return true
     }
