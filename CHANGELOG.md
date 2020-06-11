@@ -1,3 +1,13 @@
+#### 0.2.1 (2020-06-11)
+
+##### Chores
+
+*  Update atom-state version for examples ([e7f94144](https://github.com/JimLiu/atom-state/commit/e7f941445685c594c9ac6a245496429288da9c6d))
+
+##### New Features
+
+*  Add an atom as async by default if the default value is promise ([6ac596f8](https://github.com/JimLiu/atom-state/commit/6ac596f87e0150132826cd4835aef25c1b30aba0))
+
 ### 0.2.0 (2020-06-10)
 
 ##### New Features
