@@ -27,6 +27,26 @@ test('useSetAtomState should set the atom state', () => {
   expect(store.getAtomValue('name')).toEqual('Junmin')
 })
 
+test('useSetAtomState should set the atom state with a function', () => {
+  const store = createStore({ count: 1 })
+
+  const wrapper: FunctionComponent = ({ children }) => (
+    <AtomRoot store={store}>{children}</AtomRoot>
+  )
+
+  const { result, rerender } = renderHook(() => useSetAtomState('count'), {
+    wrapper
+  })
+
+  act(() => {
+    result.current((c: any) => c + 1)
+  })
+
+  rerender()
+
+  expect(store.getAtomValue('count')).toEqual(2)
+})
+
 test('useSetAtomState should not cause re-render after atom changed', async () => {
   const store = createStore({ name: 'Atom' })
   const TestComponent: FunctionComponent = () => {

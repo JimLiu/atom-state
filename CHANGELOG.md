@@ -2,26 +2,26 @@
 
 ##### Continuous Integration
 
-*  Only deploy document if the commit message contains "docs" ([7976826a](https://github.com/JimLiu/atom-state/commit/7976826ace27e87629c107db3a68e44aebf3fe7e))
-*  Add github action to deploy document ([d57e5c56](https://github.com/JimLiu/atom-state/commit/d57e5c5661887d947dbf90c2440c72e980d06e7c))
+- Only deploy document if the commit message contains "docs" ([7976826a](https://github.com/JimLiu/atom-state/commit/7976826ace27e87629c107db3a68e44aebf3fe7e))
+- Add github action to deploy document ([d57e5c56](https://github.com/JimLiu/atom-state/commit/d57e5c5661887d947dbf90c2440c72e980d06e7c))
 
 ##### Documentation Changes
 
-*  Add basic documents ([71f89c39](https://github.com/JimLiu/atom-state/commit/71f89c396d0205b6abdb1560bf4a19e5a0c666c0))
+- Add basic documents ([71f89c39](https://github.com/JimLiu/atom-state/commit/71f89c396d0205b6abdb1560bf4a19e5a0c666c0))
 
 ##### New Features
 
-*  return unsubscribe function for subscribeAtom ([8f171768](https://github.com/JimLiu/atom-state/commit/8f171768114da84e0f193714fd00d713ff08039e))
+- return unsubscribe function for subscribeAtom ([8f171768](https://github.com/JimLiu/atom-state/commit/8f171768114da84e0f193714fd00d713ff08039e))
 
 #### 0.2.1 (2020-06-11)
 
 ##### Chores
 
-*  Update atom-state version for examples ([e7f94144](https://github.com/JimLiu/atom-state/commit/e7f941445685c594c9ac6a245496429288da9c6d))
+- Update atom-state version for examples ([e7f94144](https://github.com/JimLiu/atom-state/commit/e7f941445685c594c9ac6a245496429288da9c6d))
 
 ##### New Features
 
-*  Add an atom as async by default if the default value is promise ([6ac596f8](https://github.com/JimLiu/atom-state/commit/6ac596f87e0150132826cd4835aef25c1b30aba0))
+- Add an atom as async by default if the default value is promise ([6ac596f8](https://github.com/JimLiu/atom-state/commit/6ac596f87e0150132826cd4835aef25c1b30aba0))
 
 ### 0.2.0 (2020-06-10)
 

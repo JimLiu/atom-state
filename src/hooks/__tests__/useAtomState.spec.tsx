@@ -7,13 +7,16 @@ import AtomRoot from '../../components/AtomRoot'
 import createStore from '../../utils/createStore'
 import useAtomState from '../useAtomState'
 
-test('useAtomState should return the atom state', () => {
+const nextTick = () => new Promise(resolve => setImmediate(resolve))
+
+test('useAtomState should return the atom state', async () => {
   const store = createStore({ name: 'Atom' })
 
   const wrapper: FunctionComponent = ({ children }) => (
     <AtomRoot store={store}>{children}</AtomRoot>
   )
 
+  await nextTick()
   const { result } = renderHook(() => useAtomState('name'), { wrapper })
 
   expect(result.current[0]).toEqual('Atom')

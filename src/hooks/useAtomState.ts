@@ -9,6 +9,7 @@ export default function useAtomState (atomKey: any): [any, SetAtomValueFunc] {
 
   useEffect(() => {
     const subscriber = () => {
+      // force the component to re-render
       setCounter(count => count + 1)
     }
     return store.subscribeAtom(atomKey, subscriber)
