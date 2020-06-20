@@ -159,19 +159,8 @@ describe('unsubscribeAtom()', () => {
   test('should unsubscribe the atom value change', async () => {
     const mockLisener = jest.fn()
     const store = createStore({ foo: 'bar' })
-    store.subscribeAtom('foo', mockLisener)
-    store.unsubscribeAtom('foo', mockLisener)
-    store.setAtomValue('foo', 'new bar')
-
-    await nextTick()
-    expect(mockLisener.mock.calls.length).toBe(0)
-  })
-
-  test('should unsubscribe a not subscribed key', async () => {
-    const store = createStore({ foo: 'bar' })
-
-    const mockLisener = jest.fn()
-    store.unsubscribeAtom('foo', mockLisener)
+    const unsubscribeAtom = store.subscribeAtom('foo', mockLisener)
+    unsubscribeAtom()
     store.setAtomValue('foo', 'new bar')
 
     await nextTick()

@@ -13,8 +13,9 @@ function notInAContextWithReturn () {
 }
 
 export class DefaultAtomStore implements IAtomStore {
-  subscribeAtom = notInAContext
-  unsubscribeAtom = notInAContextWithReturn
+  subscribeAtom = () => {
+    return () => {}
+  }
   containsAtom = notInAContextWithReturn
   isAtomPromise = notInAContextWithReturn
   getAtomValue = notInAContextWithReturn
