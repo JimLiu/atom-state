@@ -1,3 +1,18 @@
+### 0.3.0 (2020-06-20)
+
+##### Continuous Integration
+
+*  Only deploy document if the commit message contains "docs" ([7976826a](https://github.com/JimLiu/atom-state/commit/7976826ace27e87629c107db3a68e44aebf3fe7e))
+*  Add github action to deploy document ([d57e5c56](https://github.com/JimLiu/atom-state/commit/d57e5c5661887d947dbf90c2440c72e980d06e7c))
+
+##### Documentation Changes
+
+*  Add basic documents ([71f89c39](https://github.com/JimLiu/atom-state/commit/71f89c396d0205b6abdb1560bf4a19e5a0c666c0))
+
+##### New Features
+
+*  return unsubscribe function for subscribeAtom ([8f171768](https://github.com/JimLiu/atom-state/commit/8f171768114da84e0f193714fd00d713ff08039e))
+
 #### 0.2.1 (2020-06-11)
 
 ##### Chores
