@@ -1,8 +1,9 @@
-import AtomStore from '../core/AtomStore'
+import AtomStore, { AtomValueOption } from '../core/AtomStore'
 
 export type DefaultAtomType = {
   key: any
   default: any
+  option?: AtomValueOption
 }
 
 export default function createStore (): AtomStore

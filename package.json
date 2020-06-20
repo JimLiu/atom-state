@@ -41,11 +41,16 @@
       "examples/"
     ]
   },
+  "files": [
+    "build",
+    "src"
+  ],
   "standard": {
     "ignore": [
       "node_modules/",
       "build/",
-      "examples/"
+      "examples/",
+      "docs/"
     ],
     "globals": [
       "describe",
