@@ -21,8 +21,7 @@ export type AtomPromiseType = {
 }
 
 export interface IAtomStore {
-  subscribeAtom: (key: any, listener: AtomStoreListener) => void
-  unsubscribeAtom: (key: any, listener: AtomStoreListener) => boolean
+  subscribeAtom: (key: any, listener: AtomStoreListener) => () => void
   containsAtom(key: any): boolean
   isAtomPromise(key: any): boolean
   getAtomValue: (key: any) => any
@@ -69,24 +68,11 @@ export default class AtomStore implements IAtomStore {
    * @param key - Atom key
    * @param listener - the lisener function to receive the atom changes
    */
-  subscribeAtom (key: any, listener: AtomStoreListener) {
+  subscribeAtom (key: any, listener: AtomStoreListener): () => void {
     const subscribers = this._getAtomSubscriptions(key)
     subscribers.add(listener)
-  }
 
-  /**
-   * unsubscribe a lisener for atom changes
-   * @param key - Atom key
-   * @param listener - the lisener function you want to unsubscribe
-   */
-  unsubscribeAtom (key: any, listener: AtomStoreListener): boolean {
-    const subscribers = this._getAtomSubscriptions(key)
-    if (!subscribers.has(listener)) {
-      return false
-    }
-
-    subscribers.delete(listener)
-    return false
+    return () => subscribers.delete(listener)
   }
 
   /**
