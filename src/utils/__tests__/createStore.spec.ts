@@ -22,11 +22,13 @@ describe('create store with an object parms', () => {
   test('should create with a key value object', () => {
     let store = createStore({
       foo: 'bar',
-      name: 'atom-state'
+      name: 'atom-state',
+      [Symbol.for('a')]: 'a',
+      0: 0
     })
     expect(store instanceof AtomStore).toBe(true)
     expect(store instanceof AtomStore).toBe(true)
-    expect(store._atomValues.size).toBe(2)
+    expect(store._atomValues.size).toBe(4)
   })
 
   test('should create with a null/0 value', () => {
@@ -81,19 +83,22 @@ describe('create store with an DefaultAtomType', () => {
       {
         key: 'undefined',
         default: undefined
+      },
+      {
+        key: 0,
+        default: 0
       }
     ])
     expect(store instanceof AtomStore).toBe(true)
-    expect(store._atomValues.size).toBe(3)
+    expect(store._atomValues.size).toBe(4)
   })
 })
 
-test('create store with an array', () => {
+test('create store with unsupported type', () => {
   let store = createStore([
     ['foo', 'bar'],
     ['name', 'atom-state']
   ])
   expect(store instanceof AtomStore).toBe(true)
-  expect(store instanceof AtomStore).toBe(true)
-  expect(store._atomValues.size).toBe(2)
+  expect(store._atomValues.size).toBe(0)
 })

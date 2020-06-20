@@ -19,27 +19,31 @@ export default function createStore (
   let atoms: any
   if (defaultAtoms instanceof Map) {
     atoms = defaultAtoms
-  } else if (
-    Array.isArray(defaultAtoms) &&
-    defaultAtoms.length &&
-    defaultAtoms[0].key
-  ) {
-    // Array with DefaultAtomType
-    atoms = defaultAtoms.reduce((acc, atom) => {
-      if (atom && atom.key && atom.hasOwnProperty('default')) {
-        acc.set(atom.key, atom.default)
-      }
-      return acc
-    }, new Map())
-  } else if (typeof defaultAtoms === 'object') {
-    // Convert a normal object to Map
-    atoms = Object.keys(defaultAtoms).reduce((acc, key) => {
-      acc.set(key, defaultAtoms[key])
-      return acc
-    }, new Map())
   } else {
-    atoms = new Map(defaultAtoms)
+    atoms = new Map()
   }
 
-  return new AtomStore(atoms)
+  const store = new AtomStore(atoms)
+  if (Array.isArray(defaultAtoms)) {
+    if (
+      defaultAtoms.length &&
+      defaultAtoms[0].hasOwnProperty('key') &&
+      defaultAtoms[0].hasOwnProperty('default')
+    ) {
+      defaultAtoms.forEach(atom => {
+        store.setAtomValue(atom.key, atom.default, atom.option)
+      })
+    }
+  } else if (typeof defaultAtoms === 'object') {
+    const keys: Array<any> = [
+      ...Object.keys(defaultAtoms),
+      ...Object.getOwnPropertySymbols(defaultAtoms)
+    ]
+
+    keys.forEach(key => {
+      store.setAtomValue(key, defaultAtoms[key])
+    })
+  }
+
+  return store
 }
