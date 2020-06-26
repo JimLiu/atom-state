@@ -2,7 +2,7 @@
 
 ##### New Features
 
-*  Support options for creating default atom ([95217b57](https://github.com/JimLiu/atom-state/commit/95217b574f04e23c3dd23d860f3811810aa9bc7b))
+- Support options for creating default atom ([95217b57](https://github.com/JimLiu/atom-state/commit/95217b574f04e23c3dd23d860f3811810aa9bc7b))
 
 ### 0.3.0 (2020-06-20)
 

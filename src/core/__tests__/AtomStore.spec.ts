@@ -63,20 +63,35 @@ describe('getAtomPromise()', () => {
     expect(store.getAtomPromise('foo') instanceof Promise).toBe(true)
   })
 
-  test("should return undefined if key doesn's exist", () => {
+  test('should return the original promise for a promise', () => {
     const store = createStore()
-    expect(store.getAtomPromise('foo1')).toBeUndefined()
+    const promise = Promise.resolve('bar')
+    store.setAtomValue('foo', promise)
+    expect(store.getAtomPromise('foo')).toBe(promise)
   })
 
-  test('should resolve a result', () => {
+  test("should return undefined if key doesn's exist", () => {
+    const store = createStore()
+    expect(store.getAtomPromise('foo1')).resolves.toBeUndefined()
+  })
+
+  test('should resolve a result', async () => {
     const store = createStore()
     store.setAtomValue('foo', Promise.resolve('bar'))
+    await nextTick()
     expect(store.getAtomPromise('foo')).resolves.toBe('bar')
   })
 
   test('should reject an error', () => {
     const store = createStore()
     store.setAtomValue('foo', Promise.reject('error'))
+    expect(store.getAtomPromise('foo')).rejects.toBe('error')
+  })
+
+  test('should reject an error', async () => {
+    const store = createStore()
+    store.setAtomValue('foo', Promise.reject('error'))
+    await nextTick()
     expect(store.getAtomPromise('foo')).rejects.toBe('error')
   })
 
@@ -276,5 +291,61 @@ describe('removeAtom()', () => {
     const store = createStore()
     store.removeAtom('foo')
     expect(store.containsAtom('foo')).toBe(false)
+  })
+})
+
+describe('registerAtomGroup()', () => {
+  test('should register an atom group with key mygroup-${id}', () => {
+    const store = createStore()
+    const group = store.registerAtomGroup(id => `mygroup-${id}`, 1)
+
+    const groupKey = group(1)
+    expect(groupKey).toBe('mygroup-1')
+    expect(store.containsAtom(groupKey)).toBe(true)
+    expect(store.getAtomValue(groupKey)).toBe(1)
+  })
+
+  test('should register an atom group with dynamic value', () => {
+    const store = createStore()
+    const group = store.registerAtomGroup(
+      (id: any) => `mygroup-${id}`,
+      (id: any) => id
+    )
+
+    expect(store.getAtomValue(group(2))).toBe(2)
+  })
+
+  test('should register an atom group with dynamic value and get function', () => {
+    const store = createStore({
+      seed: 2
+    })
+    const group = store.registerAtomGroup(
+      (id: any) => `mygroup-${id}`,
+      (id: any) => ({ get }: { get: (key: any) => any }) => get('seed') * id
+    )
+
+    expect(store.getAtomValue(group(2))).toBe(4)
+  })
+
+  test('should register an atom group with option', () => {
+    const store = createStore()
+    const group = store.registerAtomGroup(
+      (id: any) => `mygroup-${id}`,
+      1,
+      () => ({ isAsync: true })
+    )
+
+    expect(store.isAtomPromise(group(2))).toBe(true)
+  })
+
+  test('should NOT create new atom for an exists key', () => {
+    const store = createStore({
+      'mygroup-1': -1
+    })
+
+    const group = store.registerAtomGroup(id => `mygroup-${id}`, 1)
+
+    const groupKey = group(1)
+    expect(store.getAtomValue(groupKey)).toBe(-1)
   })
 })

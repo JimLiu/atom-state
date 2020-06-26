@@ -20,14 +20,23 @@ export type AtomPromiseType = {
   error?: Error
 }
 
+export type GetDefaultValueType = (...params: any[]) => any
+
+export type GetAtomValueOptionType = (...params: any) => AtomValueOption
+
 export interface IAtomStore {
   subscribeAtom: (key: any, listener: AtomStoreListener) => () => void
   containsAtom: (key: any) => boolean
   isAtomPromise: (key: any) => boolean
   getAtomValue: (key: any) => any
-  getAtomPromise(key: any): Promise<any> | undefined
+  getAtomPromise: (key: any) => Promise<any>
   setAtomValue: (key: any, newValue: any, option?: AtomValueOption) => void
   removeAtom: (key: any) => boolean
+  registerAtomGroup: (
+    getKey: (...params: any[]) => any,
+    getDefaultValue: GetDefaultValueType | any,
+    getOption?: AtomValueOption | GetAtomValueOptionType
+  ) => (...params: any[]) => void
 }
 
 export default class AtomStore implements IAtomStore {
@@ -103,24 +112,24 @@ export default class AtomStore implements IAtomStore {
    * Get a Promise for the atom value
    * @param key - Atom key
    */
-  getAtomPromise (key: any): Promise<any> | undefined {
-    const content: any = this.getAtomValue(key)
+  getAtomPromise (key: any): Promise<any> {
+    const content = this.getAtomValue(key)
     const atomPromise = this._atomPromises.get(key)
+    if (!atomPromise) {
+      return Promise.resolve()
+    }
 
     // The atom value is NOT a promise or has already gotten the result
     // return the content with a Promise
-    if (
-      (!this.isAtomPromise(key) && this.containsAtom(key)) ||
-      atomPromise?.status === 'success'
-    ) {
+    if (!this.isAtomPromise(key) || atomPromise.status === 'success') {
       return Promise.resolve(content)
     }
 
-    if (atomPromise?.status === 'failed') {
-      return Promise.reject(atomPromise?.error)
+    if (atomPromise.status === 'failed') {
+      return Promise.reject(atomPromise.error)
     }
 
-    return atomPromise?.promise
+    return Promise.resolve(atomPromise.promise)
   }
 
   /**
@@ -247,5 +256,40 @@ export default class AtomStore implements IAtomStore {
     this._subscriptionsForAtoms.delete(key)
 
     return result
+  }
+
+  registerAtomGroup (
+    getKey: (...params: any[]) => any,
+    getDefaultValue: GetDefaultValueType | any,
+    getOption?: AtomValueOption | GetAtomValueOptionType
+  ): (...params: any[]) => void {
+    const get = this.getAtomValue.bind(this)
+
+    return (...params: any[]) => {
+      const key = getKey(...params)
+      let value
+      if (typeof getDefaultValue === 'function') {
+        value = getDefaultValue(...params)
+      } else {
+        value = getDefaultValue
+      }
+
+      // getDefaultValue might be (...parms) => ({ get }) => any
+      if (typeof value === 'function') {
+        value = value({ get })
+      }
+
+      let option
+      if (typeof getOption === 'function') {
+        option = getOption(...params)
+      } else {
+        option = getOption
+      }
+
+      if (!this.containsAtom(key)) {
+        this.setAtomValue(key, value, option)
+      }
+      return key
+    }
   }
 }
