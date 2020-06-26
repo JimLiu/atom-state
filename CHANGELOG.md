@@ -1,3 +1,13 @@
+### 0.4.0 (2020-06-26)
+
+##### Chores
+
+*  checkout master and pull before creating release ([afc95818](https://github.com/JimLiu/atom-state/commit/afc958181f9e3f4179c85b420f2171aba6e0b8e1))
+
+##### New Features
+
+*  Add new method `registerAtomGroup` for store ([361a2e77](https://github.com/JimLiu/atom-state/commit/361a2e77e5ce694b1dcc888656eaebf2179f027d))
+
 #### 0.3.1 (2020-06-20)
 
 ##### New Features
