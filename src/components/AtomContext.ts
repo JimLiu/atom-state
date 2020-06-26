@@ -22,10 +22,14 @@ export class DefaultAtomStore implements IAtomStore {
   getAtomValue = notInAContextWithReturn
   getAtomPromise = () => {
     notInAContext()
-    return undefined
+    return Promise.resolve()
   }
   setAtomValue = notInAContext
   removeAtom = notInAContextWithReturn
+  registerAtomGroup = () => {
+    notInAContext()
+    return () => {}
+  }
 }
 
 const defaultStore = new DefaultAtomStore()

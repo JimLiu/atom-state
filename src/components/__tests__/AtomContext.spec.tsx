@@ -22,11 +22,9 @@ type TestComponentProps = {
 
 const TestComponent: FunctionComponent<TestComponentProps> = ({ atomKey }) => {
   const store = useContext(AtomContext)
-  const promise = store.getAtomPromise(atomKey)
   return (
     <span>
       {store.getAtomValue(atomKey)}
-      {promise}
       {store.containsAtom(atomKey)}
     </span>
   )
